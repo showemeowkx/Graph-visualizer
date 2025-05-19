@@ -1,19 +1,22 @@
 import tkinter as tk
+from matrix import fillMatrix, convertMatrix
 from graph import drawGraph
+from window_configs.main_frame import createMainFrame
+from window_configs.utils.log_file import*
+from window_configs.utils.win_helpers import*
 
-def createMainWin(matrixDir, matrixUndir):
+def createMainWin():
     mainWin = tk.Tk()
 
     graphOptions = {'r': 200, 'node_r': 25, 'cx':350, 'cy':250}
 
     mainWin.title("Graph Visualizer")
-    mainWin.geometry("800x600")
+    mainWin.geometry("800x700")
     mainWin.resizable(0, 0)
 
-    graphLabel = tk.Label(mainWin, text="Directed Graph", font=("Arial", 14, "bold"), pady=10)
-    graphLabel.pack()
-
     isDirected = [1]
+    isCondensation = [0]
+    logPath = initDir()
 
     def changeGraph():
         isDirected[0] = 1 - isDirected[0]
@@ -24,12 +27,73 @@ def createMainWin(matrixDir, matrixUndir):
             drawGraph(canvas, matrixUndir, graphOptions, isDirected[0])
             graphLabel.config(text="Undirected Graph")
 
-    changeGraphBtn = tk.Button(mainWin, text="Change", font=("Helvetica", 11, "italic"), command=changeGraph)
-    changeGraphBtn.pack()
+    def generateGraph():
+        seedNums = validateSeedText(seedText.get("1.0", "end-1c"))
+        formula = validateFormulaText(formulaText.get("1.0", "end-1c"))
+
+        if seedNums and formula:
+            global matrixDir, matrixUndir, strongComponentsStr
+
+            isDirected[0] = 1
+            components = [changeGraphBtn, logAnalysisBtn, drawCondensationGraphBtn]
+            enableComponnets(components)
+            graphLabel.config(text="Directed Graph")
+            matrixDir = fillMatrix(seedNums[0], seedNums[1], seedNums[2], seedNums[3], formula)
+            matrixUndir = convertMatrix(matrixDir)
+
+            drawGraph(canvas, matrixDir, graphOptions, 1)
+
+    def logAnalysis():
+        if isDirected[0] == 0:
+            mode = 0
+            matrix = matrixUndir
+        else:
+            mode = 1
+            matrix = matrixDir
+
+        seed = seedText.get("1.0", "end-1c")
+        formula = formulaText.get("1.0", "end-1c")
+        logText = analyzeGraph(matrix, seed, formula, mode)
+        addLogFile(seed, logPath, logText)
+        
+    def drawCondensationGraph():
+        components = [changeGraphBtn, logAnalysisBtn, seedText, formulaText]
+        if isCondensation[0] == 0:
+            matrixCond = buildCondensationMatrix(matrixDir)
+            graphLabel.config(text="Condensation Graph")
+            drawCondensationGraphBtn.config(text="Back to Directed")
+            disableComponnets(components)
+            isCondensation[0] = 1
+            drawGraph(canvas, matrixCond, graphOptions, 1)
+            strongComponentsStr = showComponents(getStrongComponents(matrixDir))
+            strongComponentsLabel.config(text=f"{strongComponentsStr}")
+            changeGraphBtn.pack_forget()
+            strongComponentsLabel.pack(pady=5)
+        else:
+            graphLabel.config(text="Directed Graph")
+            drawCondensationGraphBtn.config(text="Condensation Graph")
+            enableComponnets(components)
+            isDirected[0] = 1
+            isCondensation[0] = 0
+            drawGraph(canvas, matrixDir, graphOptions, 1)
+            strongComponentsLabel.pack_forget()
+            changeGraphBtn.pack(pady=5)
+
+    graphLabel = tk.Label(mainWin, text="Generate Graph", font=("Arial", 14, "bold"), pady=10)
+    graphLabel.pack(pady=5)
+
+    seedText, formulaText, logAnalysisBtn, drawCondensationGraphBtn, generateGraphBtn = createMainFrame(mainWin)
+
+    logAnalysisBtn.config(command=logAnalysis)
+    drawCondensationGraphBtn.config(command=drawCondensationGraph)
+    generateGraphBtn.config(command=generateGraph)
 
     canvas = tk.Canvas(mainWin, width=700, height=500, bg='white')
     canvas.pack()
 
-    drawGraph(canvas, matrixDir, graphOptions, 1)
+    strongComponentsLabel = tk.Label(mainWin, text="", font=("Consolas", 9), pady=2.5)
+
+    changeGraphBtn = tk.Button(mainWin, text="Change", font=("Helvetica", 11, "italic"), pady=2.5, command=changeGraph, state=tk.DISABLED)
+    changeGraphBtn.pack(pady=5)
 
     return mainWin
