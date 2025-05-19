@@ -14,7 +14,7 @@ def calculatePos(n, r, cx, cy):
 
     return positions
 
-def drawArrow(canvas, x1, y1, x2, y2, offset, mode):
+def drawArrow(canvas, x1, y1, x2, y2, offset, mode, color="black", width=1):
     dx = x2 - x1
     dy = y2 - y1
     dist = math.sqrt(dx*dx + dy*dy)
@@ -26,7 +26,7 @@ def drawArrow(canvas, x1, y1, x2, y2, offset, mode):
     y2 -= dy * ratio
 
     if mode == 0:
-        canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST)
+        canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST, fill=color, width=width)
     else:
         dx = dx / dist
         dy = dy / dist
@@ -41,7 +41,7 @@ def drawArrow(canvas, x1, y1, x2, y2, offset, mode):
         ctrlx = (x1 + x2) / 2 + midx * offset
         ctrly = (y1 + y2) / 2 + midy * offset
 
-        canvas.create_line(x1, y1, ctrlx, ctrly, x2, y2, smooth=True, arrow=tk.LAST)
+        canvas.create_line(x1, y1, ctrlx, ctrly, x2, y2, smooth=True, arrow=tk.LAST, fill=color, width=width)
 
 def drawLoop(canvas, x, y, options, type):
     canvas.create_oval(x + options['offset'], 
@@ -52,22 +52,30 @@ def drawLoop(canvas, x, y, options, type):
         canvas.create_line(x + options['offset'] + (2*options['loop_r']), y,
                         x + options['offset'] + (2*options['loop_r']) - 5, y - 5,
                         arrow=tk.LAST)
+        
+def drawParallelEdges(canvas, positions, edges, options, visitedEdges):
+    parallelEdges = getParallelEdges(edges)
+    edges = [(i,j) for (i,j) in edges if (i,j) not in parallelEdges and (j,i) not in parallelEdges]
+    for (x, y) in parallelEdges:
+        color = "black"
+        width = 1
+        if visitedEdges is not None and (x, y) in visitedEdges:
+            color = "red"
+            width = 3
+        x1, y1 = positions[x]
+        x2, y2 = positions[y]
+        
+        drawArrow(canvas, x1, y1, x2, y2, options['node_r'], 1, color, width)
+    
+    return edges
 
-def drawGraph(canvas, matrix, options, type):
-    canvas.delete("all")
-    size = len(matrix)
-    positions = calculatePos(size, options['r'], options['cx'], options['cy'])
-    edges = getEdgeList(matrix)
-
-    if type == 1:
-        parallelEdges = getParallelEdges(edges)
-        edges = [(i,j) for (i,j) in edges if (i,j) not in parallelEdges and (j,i) not in parallelEdges]
-        for (x, y) in parallelEdges:
-            x1, y1 = positions[x]
-            x2, y2 = positions[y]
-            drawArrow(canvas, x1, y1, x2, y2, options['node_r'], 1)
-
+def drawEdges(canvas, size, positions, edges, options, visitedEdges, type):
     for (x, y) in edges:
+        color = "black"
+        width = 1
+        if visitedEdges is not None and (x, y) in visitedEdges:
+            color = "red"
+            width = 3
         if x == y:
             x0, y0 = positions[x]
             if x <= round(size*0.25) or x >= round(size*0.75):
@@ -79,14 +87,39 @@ def drawGraph(canvas, matrix, options, type):
             x1, y1 = positions[x]
             x2, y2 = positions[y]
             if type == 1:
-                drawArrow(canvas, x1, y1, x2, y2, options['node_r'], 0)
+                drawArrow(canvas, x1, y1, x2, y2, options['node_r'], 0, color, width)
             else: canvas.create_line(x1, y1, x2, y2)
 
+def drawVertices(canvas, positions, options, current, visitedVertices):
+    drawn = []
     for i, (x, y) in enumerate(positions):
+        color = "lightblue"
+        if current is not None:
+            if i == current and i not in drawn:
+                color = "grey"
+                drawn.append(i)
+        if visitedVertices is not None:
+            if i in visitedVertices and i not in drawn:
+                color = "lightgreen"
+                drawn.append(i)
+
         canvas.create_oval(
             x - options['node_r'], y - options['node_r'],
             x + options['node_r'], y + options['node_r'],
-            fill="lightblue"
+            fill=color
         )
 
         canvas.create_text(x, y, text=str(i+1))
+
+def drawGraph(canvas, matrix, options, type, current=None, visitedEdges=None, visitedVertices=None):
+    canvas.delete("all")
+    size = len(matrix)
+    positions = calculatePos(size, options['r'], options['cx'], options['cy'])
+    edges = getEdgeList(matrix)
+
+    if type == 1:
+        edges = drawParallelEdges(canvas, positions, edges, options, visitedEdges)
+
+    drawEdges(canvas, size, positions, edges, options, visitedEdges, type)
+    drawVertices(canvas, positions, options, current, visitedVertices)
+

@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 def createMainFrame(mainWin):
     mainFrame = tk.Frame(mainWin)
@@ -17,7 +18,10 @@ def createMainFrame(mainWin):
     ctrlSubFrameR.pack(side=tk.RIGHT, padx=2.5)
 
     ctrlSubFrameD = tk.Frame(mainFrame, width=650, height=10)
-    ctrlSubFrameD.pack(pady=5)
+    ctrlSubFrameD.pack(pady=2.5)
+
+    traversalFrame = tk.Frame(mainFrame, width=650, height=10)
+    traversalFrame.pack(pady=2.5)
 
     seedLabel = tk.Label(ctrlSubFrameL, text="Seed:", font=("Arial", 11), anchor="w")
     seedLabel.pack(fill="both")
@@ -40,4 +44,11 @@ def createMainFrame(mainWin):
     generateGraphBtn = tk.Button(ctrlSubFrameD, text="Generate", font=("Helvetica", 11))
     generateGraphBtn.pack(padx=2.5)
 
-    return seedText, formulaText, logAnalysisBtn, drawCondensationGraphBtn, generateGraphBtn
+    traversalBtn = tk.Button(traversalFrame, text="Start Traversal", font=("Helvetica", 11), state=tk.DISABLED)
+    traversalBtn.pack(padx=2.5, side=tk.LEFT)
+
+    traversalBox = ttk.Combobox(traversalFrame, font=("Helvetica", 11), width=5, state='readonly')
+    traversalBox.set("BFS")
+    traversalBox.pack(padx=2.5, side=tk.RIGHT)
+
+    return seedText, formulaText, logAnalysisBtn, drawCondensationGraphBtn, generateGraphBtn, traversalBtn, traversalBox
