@@ -1,4 +1,5 @@
 import tkinter as tk
+from traversal import findStartVertex
 from window_configs.utils.log_builder import*
 
 def disableComponnets(components):
@@ -30,6 +31,31 @@ def validateFormulaText(formula):
         
     except: 
         return False
+    
+def validateStartText(start, matrix):
+    size = len(matrix)
+    try:
+        start = int(start)
+        if start > size or start < 0 or sum(matrix[start-1]) == 0:
+            return None
+        elif start == 0:
+            return findStartVertex(matrix)
+        
+        return start-1
+    except ValueError:
+        if start.strip() == "":
+            return findStartVertex(matrix)
+
+        return None
+    
+def validateStartTextLength(text, maxLength, event="<KeyRelease>"):
+    def validate(event):
+        if len(text.get("1.0", "end-1c")) > maxLength:
+            text.delete("1.0", "end-1c")
+            text.insert("1.0", text.get("1.0", "end-1c")[:2])
+        return True
+    
+    text.bind(event, validate)
     
 def showComponents(components):
     componentsStr = ""

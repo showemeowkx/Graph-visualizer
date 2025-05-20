@@ -11,7 +11,7 @@ def createMainWin():
 
     graphOptions = {'r': 200, 'node_r': 25, 'cx':350, 'cy':250}
 
-    mainWin.title("Oleksandr Cherepov IM-43 | Graph")
+    mainWin.title("Graph Visualizer")
     mainWin.geometry("800x725")
     mainWin.resizable(0, 0)
 
@@ -38,7 +38,7 @@ def createMainWin():
             global matrixDir, matrixUndir, strongComponentsStr
 
             isDirected[0] = 1
-            components = [generateGraphBtn, changeGraphBtn, logAnalysisBtn, drawCondensationGraphBtn, traversalBtn]
+            components = [generateGraphBtn, changeGraphBtn, logAnalysisBtn, drawCondensationGraphBtn, traversalBtn, seedText, formulaText, startText]
             enableComponnets(components)
             graphLabel.config(text="Directed Graph")
             changeGraphBtn.config(text="Change", command=changeGraph)
@@ -61,7 +61,7 @@ def createMainWin():
         addLogFile(seed, logPath, logText)
         
     def drawCondensationGraph():
-        components = [changeGraphBtn, logAnalysisBtn, seedText, formulaText]
+        components = [changeGraphBtn, logAnalysisBtn, seedText, formulaText, startText, traversalBtn]
         if isCondensation[0] == 0:
             matrixCond = buildCondensationMatrix(matrixDir)
             graphLabel.config(text="Condensation Graph")
@@ -84,23 +84,24 @@ def createMainWin():
             changeGraphBtn.pack(pady=5)
 
     def startTraversal():
-        global traversalMode
-        components = [generateGraphBtn, logAnalysisBtn, drawCondensationGraphBtn, traversalBtn, seedText, formulaText]
-        disableComponnets(components)
-        graphLabel.config(text=f"[{traversalBox.get()}] Traversal...")
-        changeGraphBtn.config(text="Next")
-        changeGraphBtn.config(command=nextStep)
-        start = findStartVertex(matrixDir)
-        if traversalBox.get() == "BFS":
-            global bfsGen
-            traversalMode = ["BFS"]
-            bfsGen = bfs(matrixDir, start)
-            nextStep()
-        else:
-            global dfsGen
-            traversalMode = ["DFS"]
-            dfsGen = dfs(matrixDir, start)
-            nextStep()
+        start = validateStartText(startText.get("1.0", "end-1c"), matrixDir)
+        if start is not None:
+            global traversalMode
+            components = [generateGraphBtn, logAnalysisBtn, drawCondensationGraphBtn, traversalBtn, seedText, formulaText, startText]
+            disableComponnets(components)
+            graphLabel.config(text=f"[{traversalBox.get()}] Traversal...")
+            changeGraphBtn.config(text="Next")
+            changeGraphBtn.config(command=nextStep)
+            if traversalBox.get() == "BFS":
+                global bfsGen
+                traversalMode = ["BFS"]
+                bfsGen = bfs(matrixDir, start)
+                nextStep()
+            else:
+                global dfsGen
+                traversalMode = ["DFS"]
+                dfsGen = dfs(matrixDir, start)
+                nextStep()
 
     def nextStep():
         if traversalMode[0] == "BFS":
@@ -127,8 +128,10 @@ def createMainWin():
     graphLabel = tk.Label(mainWin, text="Generate Graph", font=("Arial", 14, "bold"), pady=10)
     graphLabel.pack(pady=5)
 
-    seedText, formulaText, logAnalysisBtn, drawCondensationGraphBtn, generateGraphBtn, traversalBtn, traversalBox = createMainFrame(mainWin)
+    seedText, formulaText, logAnalysisBtn, drawCondensationGraphBtn, generateGraphBtn, startText, startLabel, traversalBtn, traversalBox = createMainFrame(mainWin)
 
+    validateStartTextLength(startText, 2)
+    validateStartTextLength(seedText, 4)
     traversalBox.config(values=["BFS", "DFS"])
     logAnalysisBtn.config(command=logAnalysis)
     drawCondensationGraphBtn.config(command=drawCondensationGraph)
