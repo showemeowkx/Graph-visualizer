@@ -38,14 +38,11 @@ Python Graph Visualizer is a desktop application for creating, visualizing, and 
        python main.py
    ```
 
-2. Use the GUI to generate and analyze graphs. Export the metrics if needed.
-
+2. Use the GUI to generate, analyze and traverse graphs. Export the metrics if needed.
 3. A graph generates within next rules:
 
-   - The seed should contain 4 numbers (`n1, n2, n3, n4`)
-
-   - The formula may contain some of this variables and should return an int/float (e.g. `1.0-n3\*0.01-n4\*0.005-0.15`)
-
+   - The seed contains 4 numbers (`n1, n2, n3, n4`)
+   - The formula may contain some of this variables and should return an int or a float (e.g. `1.0-n3\*0.01-n4\*0.005-0.15`)
    - Amount of the vertices depends on `n3` and is equal to `n3+10`
 
 4. New analysis text files are exported to a `./logs` directory
@@ -53,7 +50,6 @@ Python Graph Visualizer is a desktop application for creating, visualizing, and 
 ## Dependencies
 
 - Python 3.7 or higher
-
 - Tkinter (usually bundled with Python)
 
 ## Contributing
