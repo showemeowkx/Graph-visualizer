@@ -64,7 +64,7 @@ def showComponents(components):
 
     return componentsStr
     
-def analyzeGraph(matrix, seed, formula, mode):
+def analyzeGraph(matrix, seed, formula, mode, treeMatrix=None, vertexNumbering=None):
     graphType = stringifyType(mode)
     settings = stringifySettings(seed, formula)
     adjancency = stringifyMatrix(matrix, "Adjancency matrix")
@@ -81,7 +81,11 @@ def analyzeGraph(matrix, seed, formula, mode):
     components = stringifyComponents(matrix)
     condensation = buildCondensationMatrix(matrix)
     condensationStr = stringifyMatrix(condensation, "Condensation matrix")
-
-    analysis = "GRAPH ANALYSIS:\n"+graphType+settings+adjancency+degrees+regular+isolated+leaves+doublePaths+tripplePaths+reachStr+strongStr+components+condensationStr
+    if treeMatrix is not None and vertexNumbering is not None:
+        tree = stringifyMatrix(treeMatrix, "Traversal tree matrix")
+        vertexNumberingStr = stringifyVertexNumbering(vertexNumbering)
+        analysis = "GRAPH ANALYSIS:\n"+graphType+settings+adjancency+degrees+regular+isolated+leaves+doublePaths+tripplePaths+reachStr+strongStr+components+condensationStr+tree+vertexNumberingStr
+    else:
+        analysis = "GRAPH ANALYSIS:\n"+graphType+settings+adjancency+degrees+regular+isolated+leaves+doublePaths+tripplePaths+reachStr+strongStr+components+condensationStr
 
     return analysis

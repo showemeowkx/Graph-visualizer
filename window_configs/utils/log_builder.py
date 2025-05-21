@@ -89,3 +89,12 @@ def stringifyComponents(matrix):
     componentsStr += "\n\n"
 
     return componentsStr
+
+def stringifyVertexNumbering(vertexNumbering):
+    vertexNumberingStr = "\nVertex numbering: "
+    for key, value in vertexNumbering.items():
+        vertexNumberingStr += f"\n({key+1}) -> {value+1}"
+
+    vertexNumberingStr += "\n"
+
+    return vertexNumberingStr

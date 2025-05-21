@@ -1,4 +1,4 @@
-from analysis import getReachable, calcSemiDegrees
+from analysis import getReachable, calcSemiDegrees, buildTraversalTreeMatrix
 
 def findStartVertex(matrix):
     size = len(matrix)
@@ -6,6 +6,9 @@ def findStartVertex(matrix):
         if sum(matrix[v]) > 0:
             return v
     return None
+
+def getVertexNumbering(visited):
+    return {orig: new for new, orig in enumerate(visited)}
 
 def getTraversalSize(matrix):
     degrees = calcSemiDegrees(matrix)
@@ -24,10 +27,14 @@ def bfs(matrix, start):
         current = queue.pop(0)
 
         if len(visited) == vertSize:
+            vertexNumbering = getVertexNumbering(visited)
+            treeMatrix = buildTraversalTreeMatrix(matrixSize, edges, vertexNumbering)
             yield {
                 'current': None,
                 'visited': visited[:],
                 'edges': edges[:],
+                'treeMatrix': treeMatrix,
+                'vertexNumbering': vertexNumbering,
                 'end': True
             }
 
@@ -56,10 +63,14 @@ def dfs(matrix, start):
         found = False
 
         if len(visited) == vertSize:
+            vertexNumbering = getVertexNumbering(visited)
+            treeMatrix = buildTraversalTreeMatrix(matrixSize, edges, vertexNumbering)
             yield {
                 'current': None,
                 'visited': visited[:],
                 'edges': edges[:],
+                'treeMatrix': treeMatrix,
+                'vertexNumbering': vertexNumbering,
                 'end': True
             }
 

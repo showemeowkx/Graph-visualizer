@@ -35,7 +35,7 @@ def createMainWin():
         formula = validateFormulaText(formulaText.get("1.0", "end-1c"))
 
         if seedNums and formula:
-            global matrixDir, matrixUndir, strongComponentsStr
+            global matrixDir, matrixUndir
 
             isDirected[0] = 1
             components = [generateGraphBtn, changeGraphBtn, logAnalysisBtn, drawCondensationGraphBtn, traversalBtn, seedText, formulaText, startText]
@@ -57,7 +57,7 @@ def createMainWin():
 
         seed = seedText.get("1.0", "end-1c")
         formula = formulaText.get("1.0", "end-1c")
-        logText = analyzeGraph(matrix, seed, formula, mode)
+        logText = analyzeGraph(matrix, seed, formula, mode, treeMatrix, vertexNumbering)
         addLogFile(seed, logPath, logText)
         
     def drawCondensationGraph():
@@ -104,26 +104,18 @@ def createMainWin():
                 nextStep()
 
     def nextStep():
-        if traversalMode[0] == "BFS":
-            try:
-                step = next(bfsGen)
-                drawGraph(canvas, matrixDir, graphOptions, 1, step['current'], step['edges'], step['visited'])
-                if step['end']:
-                    changeGraphBtn.config(text="Stop")
-                    changeGraphBtn.config(command=generateGraph)
-            except StopIteration:
+        try:
+            step = next(bfsGen) if traversalMode[0] == "BFS" else next(dfsGen)
+            drawGraph(canvas, matrixDir, graphOptions, 1, step['current'], step['edges'], step['visited'])
+            if step['end']:
+                global treeMatrix, vertexNumbering
+                treeMatrix = step['treeMatrix']
+                vertexNumbering = step['vertexNumbering']
                 changeGraphBtn.config(text="Stop")
                 changeGraphBtn.config(command=generateGraph)
-        else:
-            try:
-                step = next(dfsGen)
-                drawGraph(canvas, matrixDir, graphOptions, 1, step['current'], step['edges'], step['visited'])
-                if step['end']:
-                    changeGraphBtn.config(text="Stop")
-                    changeGraphBtn.config(command=generateGraph)
-            except StopIteration:
-                changeGraphBtn.config(text="Stop")
-                changeGraphBtn.config(command=generateGraph)
+        except StopIteration:
+            changeGraphBtn.config(text="Stop")
+            changeGraphBtn.config(command=generateGraph)
 
     graphLabel = tk.Label(mainWin, text="Generate Graph", font=("Arial", 14, "bold"), pady=10)
     graphLabel.pack(pady=5)

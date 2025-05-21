@@ -191,3 +191,11 @@ def buildCondensationMatrix(matrix):
                     condensationMatrix[ci-1][cj-1] = 1
     
     return condensationMatrix
+
+def buildTraversalTreeMatrix(size, edges, vertexNumbering):
+    treeMatrix = [[0]*size for _ in range(size)]
+    print(vertexNumbering)
+    for (i, j) in edges:
+        treeMatrix[vertexNumbering[i]][vertexNumbering[j]] = 1
+        
+    return treeMatrix
