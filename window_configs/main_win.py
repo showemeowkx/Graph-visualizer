@@ -7,6 +7,7 @@ from window_configs.utils.log_file import*
 from window_configs.utils.win_helpers import*
 
 def createMainWin():
+    global treeMatrix, vertexNumbering
     mainWin = tk.Tk()
 
     graphOptions = {'r': 200, 'node_r': 25, 'cx':350, 'cy':250}
@@ -18,6 +19,9 @@ def createMainWin():
     isDirected = [1]
     isCondensation = [0]
     logPath = initDir()
+
+    treeMatrix = None
+    vertexNumbering = None
 
     def changeGraph():
         isDirected[0] = 1 - isDirected[0]
@@ -54,13 +58,6 @@ def createMainWin():
         else:
             mode = 1
             matrix = matrixDir
-
-        try:
-            treeMatrix = treeMatrix
-            vertexNumbering = vertexNumbering
-        except:
-            treeMatrix = None
-            vertexNumbering = None
 
         seed = seedText.get("1.0", "end-1c")
         formula = formulaText.get("1.0", "end-1c")
