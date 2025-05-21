@@ -55,6 +55,13 @@ def createMainWin():
             mode = 1
             matrix = matrixDir
 
+        try:
+            treeMatrix = treeMatrix
+            vertexNumbering = vertexNumbering
+        except:
+            treeMatrix = None
+            vertexNumbering = None
+
         seed = seedText.get("1.0", "end-1c")
         formula = formulaText.get("1.0", "end-1c")
         logText = analyzeGraph(matrix, seed, formula, mode, treeMatrix, vertexNumbering)
