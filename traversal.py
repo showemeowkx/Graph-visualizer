@@ -1,9 +1,9 @@
 from analysis import getReachable, calcSemiDegrees, buildTraversalTreeMatrix
 
-def findStartVertex(matrix):
+def findStartVertex(matrix, visited=[]):
     size = len(matrix)
     for v in range(size):
-        if sum(matrix[v]) > 0:
+        if v not in visited and sum(matrix[v]) > 0:
             return v
     return None
 
@@ -16,19 +16,18 @@ def getTraversalSize(matrix):
     return vertSize
 
 def bfs(matrix, start):
-    matrixSize = len(matrix)
-    vertSize = getTraversalSize(matrix)
+    size = len(matrix)
     queue = [start]
     visited = [start]
     edges = []
     current = start
 
-    while queue:
+    while queue or start is not None:
         current = queue.pop(0)
 
-        if len(visited) == vertSize:
+        if len(visited) == size or start is None:
             vertexNumbering = getVertexNumbering(visited)
-            treeMatrix = buildTraversalTreeMatrix(matrixSize, edges, vertexNumbering)
+            treeMatrix = buildTraversalTreeMatrix(size, edges)
             yield {
                 'current': None,
                 'visited': visited[:],
@@ -38,7 +37,7 @@ def bfs(matrix, start):
                 'end': True
             }
 
-        for i in range(matrixSize):
+        for i in range(size):
             if matrix[current][i] == 1 and i not in visited:
                 yield {
                     'current': current,
@@ -50,21 +49,22 @@ def bfs(matrix, start):
                 edges.append((current, i))
                 queue.append(i)
 
+        start = findStartVertex(matrix, visited)
+
 def dfs(matrix, start):
-    matrixSize = len(matrix)
-    vertSize = getTraversalSize(matrix)
+    size = len(matrix)
     stack = [start]
     visited = [start]
     edges = []
     current = start
 
-    while stack:
+    while stack or start is not None:
         current = stack[-1]
         found = False
 
-        if len(visited) == vertSize:
+        if len(visited) == size or start is None:
             vertexNumbering = getVertexNumbering(visited)
-            treeMatrix = buildTraversalTreeMatrix(matrixSize, edges, vertexNumbering)
+            treeMatrix = buildTraversalTreeMatrix(size, edges)
             yield {
                 'current': None,
                 'visited': visited[:],
@@ -81,7 +81,7 @@ def dfs(matrix, start):
             'end': False
         }
 
-        for i in range(matrixSize):
+        for i in range(size):
             if matrix[current][i]:
                 if i not in visited:
                     visited.append(i)
@@ -91,3 +91,5 @@ def dfs(matrix, start):
                     break
         if not found:
             stack.pop()
+
+        start = findStartVertex(matrix, visited)
