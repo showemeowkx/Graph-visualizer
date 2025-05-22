@@ -47,15 +47,6 @@ def getIsolated(degrees):
 
     return isolatedVertices
 
-def getReachable(semiDegrees):
-    size = len(semiDegrees['in'])
-    reachableVertices = []
-    for i in range(size):
-        if semiDegrees['in'][i] > 0 :
-            reachableVertices.append(i+1)
-
-    return reachableVertices
-
 def getLeaves(degrees):
     size = len(degrees)
     leaves = []

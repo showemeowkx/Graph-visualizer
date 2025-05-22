@@ -1,4 +1,4 @@
-from analysis import getReachable, calcSemiDegrees, buildTraversalTreeMatrix
+from analysis import buildTraversalTreeMatrix
 
 def findStartVertex(matrix, visited=[]):
     size = len(matrix)
@@ -9,11 +9,6 @@ def findStartVertex(matrix, visited=[]):
 
 def getVertexNumbering(visited):
     return {orig: new for new, orig in enumerate(visited)}
-
-def getTraversalSize(matrix):
-    degrees = calcSemiDegrees(matrix)
-    vertSize = len(getReachable(degrees))
-    return vertSize
 
 def bfs(matrix, start):
     size = len(matrix)
