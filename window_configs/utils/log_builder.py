@@ -14,8 +14,8 @@ def stringifyType(isDirected):
 def stringifySettings(seed, formula):
     return f"\nSeed: {seed}\nFormula: {formula}\n"
 
-def stringifyMatrix(matrix, name):
-    return f"\n{name}:\n{stringify(matrix, 3)}\n"
+def stringifyMatrix(matrix, name, padding=3):
+    return f"\n{name}:\n{stringify(matrix, padding)}\n"
 
 def stringifyDegrees(matrix, mode):
     degreesStr = 'Degrees:\n'
