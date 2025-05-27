@@ -27,19 +27,25 @@ def createMainWin():
         isDirected[0] = 1 - isDirected[0]
         if isDirected[0]:
             traversalBtn.config(state=tk.NORMAL)
+            startText.config(state=tk.NORMAL)
+            graphOptions['node_r'] = 25
             drawGraph(canvas, matrixDir, graphOptions, isDirected[0])
             graphLabel.config(text="Directed Graph")
         else:
             traversalBtn.config(state=tk.DISABLED)
-            drawGraph(canvas, matrixUndir, graphOptions, isDirected[0])
+            startText.delete("1.0", "end-1c")
+            startText.config(state=tk.DISABLED)
+            graphOptions['node_r'] = 15
+            drawGraph(canvas, matrixUndir, graphOptions, isDirected[0], weighted=matrixWeight)
             graphLabel.config(text="Undirected Graph")
 
     def generateGraph():
-        seedNums = validateSeedText(seedText.get("1.0", "end-1c"))
+        seed = seedText.get("1.0", "end-1c")
+        seedNums = validateSeedText(seed)
         formula = validateFormulaText(formulaText.get("1.0", "end-1c"))
 
         if seedNums and formula:
-            global matrixDir, matrixUndir
+            global matrixDir, matrixUndir, matrixWeight
 
             isDirected[0] = 1
             components = [generateGraphBtn, changeGraphBtn, logAnalysisBtn, drawCondensationGraphBtn, traversalBtn, seedText, formulaText, startText]
@@ -48,7 +54,9 @@ def createMainWin():
             changeGraphBtn.config(text="Change", command=changeGraph)
             matrixDir = fillMatrix(seedNums[0], seedNums[1], seedNums[2], seedNums[3], formula)
             matrixUndir = convertMatrix(matrixDir)
+            matrixWeight = fillWeightedMatrix(matrixUndir, seed)
 
+            graphOptions['node_r'] = 25
             drawGraph(canvas, matrixDir, graphOptions, 1)
 
     def logAnalysis():

@@ -88,7 +88,29 @@ def drawEdges(canvas, size, positions, edges, options, visitedEdges, type):
             x2, y2 = positions[y]
             if type == 1:
                 drawArrow(canvas, x1, y1, x2, y2, options['node_r'], 0, color, width)
-            else: canvas.create_line(x1, y1, x2, y2)
+            else: 
+                canvas.create_line(x1, y1, x2, y2)
+
+def drawWeights(canvas, positions, edges, weighted):
+    for (x, y) in edges:
+        if x != y:
+            x1, y1 = positions[x]
+            x2, y2 = positions[y]
+            mid_x = (x1 + x2) / 2
+            mid_y = (y1 + y2) / 2
+
+            weight = weighted[x][y]
+            textId = canvas.create_text(mid_x, mid_y, text=str(weight))
+            bbox = canvas.bbox(textId)
+
+            if bbox:
+                canvas.create_rectangle(
+                    bbox[0] - 2, bbox[1] - 2, bbox[2] + 2, bbox[3] + 2,
+                    outline="black", fill="white"
+                )
+
+            canvas.create_text(mid_x, mid_y, text=str(weight), fill="black")
+
 
 def drawVertices(canvas, positions, options, current, visitedVertices):
     drawn = []
@@ -111,7 +133,7 @@ def drawVertices(canvas, positions, options, current, visitedVertices):
 
         canvas.create_text(x, y, text=str(i+1))
 
-def drawGraph(canvas, matrix, options, type, current=None, visitedEdges=None, visitedVertices=None):
+def drawGraph(canvas, matrix, options, type, current=None, visitedEdges=None, visitedVertices=None, weighted=None ):
     canvas.delete("all")
     size = len(matrix)
     positions = calculatePos(size, options['r'], options['cx'], options['cy'])
@@ -122,4 +144,6 @@ def drawGraph(canvas, matrix, options, type, current=None, visitedEdges=None, vi
 
     drawEdges(canvas, size, positions, edges, options, visitedEdges, type)
     drawVertices(canvas, positions, options, current, visitedVertices)
+    if type == 0:
+        drawWeights(canvas, positions, edges, weighted)
 
