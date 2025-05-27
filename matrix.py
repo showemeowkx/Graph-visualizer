@@ -70,10 +70,27 @@ def fillWeightedMatrix(matrix, seed):
     matrixWeighted = [[0]*size for _ in range(size)]
     for i in range(size):
         for j in range(size):
-            value = (matrixBin[i][j] + matrixSym[i][j] * matrixTr[i][j]) * matrixCeiled[i][j]
-            matrixWeighted[i][j] = matrixWeighted[j][i] = value
+            if i == j:
+                matrixWeighted[i][j] = 0
+            else:
+                value = (matrixBin[i][j] + matrixSym[i][j] * matrixTr[i][j]) * matrixCeiled[i][j]
+                matrixWeighted[i][j] = value if value != 0 else math.inf
 
-    return matrixWeighted
+    return validateWeightedMatrix(matrixWeighted)
+
+def validateWeightedMatrix(matrix):
+    size = len(matrix)
+    validatedMatrix = [row[:] for row in matrix]
+
+    for i in range(size):
+        for j in range(i+1, size):
+            if validatedMatrix[i][j] != math.inf or validatedMatrix[j][i] != math.inf:
+                validatedMatrix[i][j] = validatedMatrix[j][i] = min(
+                validatedMatrix[i][j] if validatedMatrix[i][j] != math.inf else float("inf"),
+                validatedMatrix[j][i] if validatedMatrix[j][i] != math.inf else float("inf"),
+            )
+
+    return validatedMatrix
 
 def convertMatrix(matrix):
     size = len(matrix)

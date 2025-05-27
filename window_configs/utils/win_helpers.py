@@ -69,8 +69,8 @@ def analyzeGraph(matrix, seed, formula, mode, treeMatrix=None, vertexNumbering=N
     graphType = stringifyType(mode)
     settings = stringifySettings(seed, formula)
     adjancency = stringifyMatrix(matrix, "Adjancency matrix")
-    weighted = fillWeightedMatrix(matrix, seed)
-    weightedStr = stringifyMatrix(weighted, "Weighted matrix", 5)
+    weighted = fillWeightedMatrix(matrix, seed) 
+    weightedStr = stringifyMatrix(weighted, "Weighted matrix", 5) if mode == 0 else ''
     degrees = stringifyDegrees(matrix, mode)
     regular = stringifyValueOrNo(matrix, mode, "Regular", "Yes | Degree:", "No", 1, isRegular)
     isolated = stringifyValueOrNo(matrix, mode, "Isolated vertices", "", "None", 1, getIsolated)
