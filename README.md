@@ -2,7 +2,7 @@
 
 ## Overview
 
-Python Graph Visualizer is a desktop application for creating, visualizing, and analyzing graphs. It supports various types of graphs (directed/undirected) and provides interactive features such as exporting graph metrics to a text file, displaying a condensation graph and execute a stepwise graph traversal.
+Python Graph Visualizer is a desktop application for creating, visualizing, and analyzing graphs. It supports various types of graphs (directed, undirected and weighted) and provides interactive features such as exporting graph metrics to a text file, displaying a condensation graph and execute a stepwise graph traversal or minimal spanning tree definition.
 
 ## Features
 
@@ -10,6 +10,7 @@ Python Graph Visualizer is a desktop application for creating, visualizing, and 
 - Export graph metrics: degree, connectivity, components
 - Display a condensation graph
 - Execute a graph traversal using BFS or DFS algorithms
+- Find a minimal spanning tree for weighted graphs
 - User-friendly GUI built with Tkinter
 
 ## Installation
