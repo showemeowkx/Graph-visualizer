@@ -40,6 +40,8 @@ def createMainWin():
             traversalBox.config(values="MST")
             traversalBox.set("MST")
             graphOptions['node_r'] = 15
+            seed = seedText.get("1.0", "end-1c")
+            matrixWeight = fillWeightedMatrix(matrixUndir, seed)
             drawGraph(canvas, matrixUndir, graphOptions, isDirected[0], weighted=matrixWeight)
             graphLabel.config(text="Undirected Graph")
 
