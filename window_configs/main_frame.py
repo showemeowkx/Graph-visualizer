@@ -61,7 +61,6 @@ def createMainFrame(mainWin):
     traversalBtn.pack(padx=2.5, side=tk.LEFT)
 
     traversalBox = ttk.Combobox(traversalSubFrameR, font=("Helvetica", 11), width=5, state='readonly')
-    traversalBox.set("BFS")
     traversalBox.pack(padx=2.5, side=tk.RIGHT)
 
     return seedText, formulaText, logAnalysisBtn, drawCondensationGraphBtn, generateGraphBtn, startText, startLabel, traversalBtn, traversalBox

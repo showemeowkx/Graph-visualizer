@@ -7,7 +7,7 @@ from window_configs.utils.log_file import*
 from window_configs.utils.win_helpers import*
 
 def createMainWin():
-    global treeMatrix, vertexNumbering
+    global treeMatrix, vertexNumbering, weightSum
     mainWin = tk.Tk()
 
     graphOptions = {'r': 200, 'node_r': 25, 'cx':350, 'cy':250}
@@ -22,19 +22,23 @@ def createMainWin():
 
     treeMatrix = None
     vertexNumbering = None
+    weightSum = None
 
     def changeGraph():
+        global matrixWeight
         isDirected[0] = 1 - isDirected[0]
         if isDirected[0]:
-            traversalBtn.config(state=tk.NORMAL)
             startText.config(state=tk.NORMAL)
+            traversalBox.config(values=["BFS", "DFS"])
+            traversalBox.set("BFS")
             graphOptions['node_r'] = 25
             drawGraph(canvas, matrixDir, graphOptions, isDirected[0])
             graphLabel.config(text="Directed Graph")
         else:
-            traversalBtn.config(state=tk.DISABLED)
             startText.delete("1.0", "end-1c")
             startText.config(state=tk.DISABLED)
+            traversalBox.config(values="MST")
+            traversalBox.set("MST")
             graphOptions['node_r'] = 15
             drawGraph(canvas, matrixUndir, graphOptions, isDirected[0], weighted=matrixWeight)
             graphLabel.config(text="Undirected Graph")
@@ -46,12 +50,13 @@ def createMainWin():
 
         if seedNums and formula:
             global matrixDir, matrixUndir, matrixWeight
-
             isDirected[0] = 1
             components = [generateGraphBtn, changeGraphBtn, logAnalysisBtn, drawCondensationGraphBtn, traversalBtn, seedText, formulaText, startText]
             enableComponnets(components)
             graphLabel.config(text="Directed Graph")
             changeGraphBtn.config(text="Change", command=changeGraph)
+            traversalBox.config(values=["BFS", "DFS"])
+            traversalBox.set("BFS")
             matrixDir = fillMatrix(seedNums[0], seedNums[1], seedNums[2], seedNums[3], formula)
             matrixUndir = convertMatrix(matrixDir)
             matrixWeight = fillWeightedMatrix(matrixUndir, seed)
@@ -60,16 +65,18 @@ def createMainWin():
             drawGraph(canvas, matrixDir, graphOptions, 1)
 
     def logAnalysis():
+        global matrixDir, matrixUndir, treeMatrix, vertexNumbering, matrixWeight, weightSum
         if isDirected[0] == 0:
             mode = 0
             matrix = matrixUndir
         else:
             mode = 1
             matrix = matrixDir
+            matrixWeight = None
 
         seed = seedText.get("1.0", "end-1c")
         formula = formulaText.get("1.0", "end-1c")
-        logText = analyzeGraph(matrix, seed, formula, mode, treeMatrix, vertexNumbering)
+        logText = analyzeGraph(matrix, seed, formula, mode, treeMatrix, vertexNumbering, matrixWeight, weightSum)
         addLogFile(seed, logPath, logText)
         
     def drawCondensationGraph():
@@ -109,22 +116,37 @@ def createMainWin():
                 traversalMode = ["BFS"]
                 bfsGen = bfs(matrixDir, start)
                 nextStep()
-            else:
+            elif traversalBox.get() == "DFS":
                 global dfsGen
                 traversalMode = ["DFS"]
                 dfsGen = dfs(matrixDir, start)
                 nextStep()
+            else:
+                global mstGen
+                traversalMode = ["MST"]
+                mstGen = mst(matrixWeight, start)
+                nextStep()
 
     def nextStep():
         try:
-            step = next(bfsGen) if traversalMode[0] == "BFS" else next(dfsGen)
-            drawGraph(canvas, matrixDir, graphOptions, 1, step['current'], step['edges'], step['visited'])
-            if step['end']:
-                global treeMatrix, vertexNumbering
-                treeMatrix = step['treeMatrix']
-                vertexNumbering = step['vertexNumbering']
-                changeGraphBtn.config(text="Stop")
-                changeGraphBtn.config(command=generateGraph)
+            mode = traversalMode[0]
+            if mode == "BFS" or mode == "DFS":
+                step = next(bfsGen) if mode == "BFS" else next(dfsGen)
+                drawGraph(canvas, matrixDir, graphOptions, 1, step['current'], step['edges'], step['visited'])
+                if step['end']:
+                    global treeMatrix, vertexNumbering
+                    treeMatrix = step['treeMatrix']
+                    vertexNumbering = step['vertexNumbering']
+                    changeGraphBtn.config(text="Stop")
+                    changeGraphBtn.config(command=generateGraph)
+            else:
+                step = next(mstGen)
+                drawGraph(canvas, matrixUndir, graphOptions, 0, step['current'], step['edges'], step['visited'], matrixWeight)
+                if step['end']:
+                    global weightSum
+                    weightSum = step['sum']
+                    changeGraphBtn.config(text="Stop")
+                    changeGraphBtn.config(command=generateGraph)
         except StopIteration:
             changeGraphBtn.config(text="Stop")
             changeGraphBtn.config(command=generateGraph)
@@ -136,7 +158,6 @@ def createMainWin():
 
     validateStartTextLength(startText, 2)
     validateStartTextLength(seedText, 4)
-    traversalBox.config(values=["BFS", "DFS"])
     logAnalysisBtn.config(command=logAnalysis)
     drawCondensationGraphBtn.config(command=drawCondensationGraph)
     generateGraphBtn.config(command=generateGraph)

@@ -65,12 +65,12 @@ def showComponents(components):
 
     return componentsStr
     
-def analyzeGraph(matrix, seed, formula, mode, treeMatrix=None, vertexNumbering=None):
+def analyzeGraph(matrix, seed, formula, mode, treeMatrix, vertexNumbering, weightMatrix, weightSum):
     graphType = stringifyType(mode)
     settings = stringifySettings(seed, formula)
-    adjancency = stringifyMatrix(matrix, "Adjancency matrix")
-    weighted = fillWeightedMatrix(matrix, seed) 
-    weightedStr = stringifyMatrix(weighted, "Weighted matrix", 5) if mode == 0 else ''
+    adjancency = stringifyMatrix(matrix, "Adjancency matrix") 
+    weightedStr = stringifyMatrix(weightMatrix, "Weighted matrix", 5) if weightMatrix is not None else ''
+    weightedSumStr = f'MST edges sum: {weightSum}\n\n' if weightSum is not None else ''
     degrees = stringifyDegrees(matrix, mode)
     regular = stringifyValueOrNo(matrix, mode, "Regular", "Yes | Degree:", "No", 1, isRegular)
     isolated = stringifyValueOrNo(matrix, mode, "Isolated vertices", "", "None", 1, getIsolated)
@@ -84,11 +84,9 @@ def analyzeGraph(matrix, seed, formula, mode, treeMatrix=None, vertexNumbering=N
     components = stringifyComponents(matrix)
     condensation = buildCondensationMatrix(matrix)
     condensationStr = stringifyMatrix(condensation, "Condensation matrix")
-    if treeMatrix is not None and vertexNumbering is not None:
-        tree = stringifyMatrix(treeMatrix, "Traversal tree matrix")
-        vertexNumberingStr = stringifyVertexNumbering(vertexNumbering)
-        analysis = "GRAPH ANALYSIS:\n"+graphType+settings+adjancency+weightedStr+degrees+regular+isolated+leaves+doublePaths+tripplePaths+reachStr+strongStr+components+condensationStr+tree+vertexNumberingStr
-    else:
-        analysis = "GRAPH ANALYSIS:\n"+graphType+settings+adjancency+weightedStr+degrees+regular+isolated+leaves+doublePaths+tripplePaths+reachStr+strongStr+components+condensationStr
+    tree = stringifyMatrix(treeMatrix, "Traversal tree matrix") if treeMatrix is not None else ''
+    vertexNumberingStr = stringifyVertexNumbering(vertexNumbering) if vertexNumbering is not None else ''
+
+    analysis = "GRAPH ANALYSIS:\n"+graphType+settings+adjancency+weightedStr+weightedSumStr+degrees+regular+isolated+leaves+doublePaths+tripplePaths+reachStr+strongStr+components+condensationStr+tree+vertexNumberingStr
 
     return analysis

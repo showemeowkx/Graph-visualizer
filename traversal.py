@@ -1,4 +1,5 @@
 from analysis import buildTraversalTreeMatrix
+import math
 
 def findStartVertex(matrix, visited=[]):
     size = len(matrix)
@@ -15,7 +16,6 @@ def bfs(matrix, start):
     queue = [start]
     visited = [start]
     edges = []
-    current = start
 
     while queue or start is not None:
         current = queue.pop(0)
@@ -51,7 +51,6 @@ def dfs(matrix, start):
     stack = [start]
     visited = [start]
     edges = []
-    current = start
 
     while stack or start is not None:
         current = stack[-1]
@@ -88,3 +87,48 @@ def dfs(matrix, start):
             stack.pop()
 
         start = findStartVertex(matrix, visited)
+
+def mst(matrix, start):
+    size = len(matrix)
+    selected = [start]
+    edges = []
+    weightSum = 0
+
+    while len(selected) != size:
+        min = math.inf
+        row = 0
+        col = 0
+
+        for i in range(size):
+            if i in selected:
+                for j in range(size):
+                    if j not in selected and matrix[i][j]:
+                        if min > matrix[i][j]:
+                            min = matrix[i][j]
+                            row = i
+                            col = j
+
+        if min == math.inf:
+            break
+
+        yield {
+            'current': row,
+            'visited': selected[:],
+            'edges': edges[:],
+            'end': False
+        }
+
+        weightSum += min
+        edges.append((row, col))
+        selected.append(col)
+    
+    yield {
+        'current': None,
+        'visited': selected[:],
+        'edges': edges[:],
+        'sum': weightSum,
+        'end': True
+    }
+
+
+

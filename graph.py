@@ -70,12 +70,15 @@ def drawParallelEdges(canvas, positions, edges, options, visitedEdges):
     return edges
 
 def drawEdges(canvas, size, positions, edges, options, visitedEdges, type):
+    drawn = []
     for (x, y) in edges:
         color = "black"
         width = 1
         if visitedEdges is not None and (x, y) in visitedEdges:
             color = "red"
             width = 3
+        elif (x, y) in drawn or (y, x) in drawn:
+            continue
         if x == y:
             x0, y0 = positions[x]
             if x <= round(size*0.25) or x >= round(size*0.75):
@@ -89,10 +92,24 @@ def drawEdges(canvas, size, positions, edges, options, visitedEdges, type):
             if type == 1:
                 drawArrow(canvas, x1, y1, x2, y2, options['node_r'], 0, color, width)
             else: 
-                canvas.create_line(x1, y1, x2, y2)
+                canvas.create_line(x1, y1, x2, y2, fill=color, width=width)
 
-def drawWeights(canvas, positions, edges, weighted):
+        drawn.append((x, y))
+
+def drawWeights(canvas, positions, edges, visitedEdges, weighted):
+    drawn = []
     for (x, y) in edges:
+        boxColor = 'white'
+        textColor = 'black'
+        outlineColor = 'black'
+
+        if visitedEdges is not None and (x, y) in visitedEdges:
+            boxColor = 'red'
+            textColor = 'white'
+            outlineColor = 'white'
+        elif (x, y) in drawn or (y, x) in drawn:
+            continue
+
         if x != y:
             x1, y1 = positions[x]
             x2, y2 = positions[y]
@@ -104,12 +121,14 @@ def drawWeights(canvas, positions, edges, weighted):
             bbox = canvas.bbox(textId)
 
             if bbox:
-                canvas.create_rectangle(
+                rectId = canvas.create_rectangle(
                     bbox[0] - 2, bbox[1] - 2, bbox[2] + 2, bbox[3] + 2,
-                    outline="black", fill="white"
+                    outline=outlineColor, fill=boxColor
                 )
+                canvas.tag_raise(textId, rectId)
 
-            canvas.create_text(mid_x, mid_y, text=str(weight), fill="black")
+            canvas.itemconfig(textId, fill=textColor)
+            drawn.append((x, y))
 
 
 def drawVertices(canvas, positions, options, current, visitedVertices):
@@ -145,5 +164,5 @@ def drawGraph(canvas, matrix, options, type, current=None, visitedEdges=None, vi
     drawEdges(canvas, size, positions, edges, options, visitedEdges, type)
     drawVertices(canvas, positions, options, current, visitedVertices)
     if type == 0:
-        drawWeights(canvas, positions, edges, weighted)
+        drawWeights(canvas, positions, edges, visitedEdges, weighted)
 
