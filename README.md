@@ -43,7 +43,7 @@ Python Graph Visualizer is a desktop application for creating, visualizing, and 
 3. A graph generates within next rules:
 
    - The seed contains 4 numbers (`n1, n2, n3, n4`)
-   - The formula may contain some of this variables and should return an int or a float (e.g. `1.0-n3\*0.01-n4\*0.005-0.15`)
+   - The formula may contain some of this variables and should return an int or a float (e.g. `1.0-n3*0.01-n4*0.005-0.15`)
    - Amount of the vertices depends on `n3` and is equal to `n3+10`
 
 4. New analysis text files are exported to a `./logs` directory
